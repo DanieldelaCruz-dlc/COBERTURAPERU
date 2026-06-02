@@ -13,14 +13,14 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             background-color: #f5f7fa;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             color: #333;
         }
         .container {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
             background: #ffffff;
-            padding: 25px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
@@ -29,34 +29,33 @@
         h1 {
             text-align: center;
             color: #1e293b;
-            font-size: 28px;
+            font-size: 26px;
             letter-spacing: 1px;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 3px solid #ef4444;
         }
         
-        /* Bloque de Filtros */
+        /* Bloque de Filtros (Responsivo) */
         .filtros-header {
             background-color: #1e293b;
             color: #ffffff;
             padding: 12px 16px;
             font-weight: 600;
             font-size: 14px;
-            letter-spacing: 0.5px;
             border-radius: 6px 6px 0 0;
         }
         .filtros-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
             background-color: #f1f5f9;
-            padding: 20px;
+            padding: 15px;
             border-radius: 0 0 6px 6px;
             border: 1px solid #e2e8f0;
             border-top: none;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .filtro-grupo {
             display: flex;
@@ -65,94 +64,119 @@
         .filtro-grupo label {
             font-size: 11px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             color: #64748b;
         }
         .filtro-grupo input {
-            padding: 10px;
-            font-size: 14px;
+            padding: 9px;
+            font-size: 13px;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background-color: #ffffff;
+            transition: all 0.2s;
+            width: 100%;
         }
         .filtro-grupo input:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Tabla de Resultados */
+        /* Tabla Responsiva */
         .tabla-wrapper {
             overflow-x: auto;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            border-radius: 6px 6px 0 0;
+            max-height: 60vh;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
             text-align: left;
             background-color: #ffffff;
+            min-width: 800px;
         }
         th {
             background-color: #1e293b;
             color: #ffffff;
             font-weight: 600;
-            padding: 14px 16px;
+            padding: 12px 15px;
             position: sticky;
             top: 0;
+            z-index: 10;
         }
         td {
-            padding: 12px 16px;
+            padding: 10px 15px;
             border-bottom: 1px solid #e2e8f0;
             color: #334155;
-            white-space: nowrap;
-        }
-        tr:last-child td {
-            border-bottom: none;
         }
         tr:hover td {
             background-color: #f8fafc;
         }
         
-        /* Estado de Cobertura Visual (Badges) */
+        /* Badges de Cobertura */
         .badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             text-align: center;
+            text-transform: capitalize;
         }
         .badge.no-cubre {
             background-color: #fee2e2;
             color: #ef4444;
+            border: 1px solid #fecaca;
         }
         .badge.si-cubre {
             background-color: #dcfce7;
-            color: #22c55e;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
         }
         .badge.pendiente {
             background-color: #fef9c3;
             color: #ca8a04;
+            border: 1px solid #fef08a;
         }
 
-        /* Alertas y Mensajes del Sistema */
+        /* Controles de Paginación */
+        .paginacion-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .btn-paginacion {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-paginacion:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+        .btn-paginacion:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
         .no-results {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: #ef4444;
             font-weight: 600;
             background-color: #fff5f5;
-        }
-        .aviso-limite {
-            text-align: center;
-            background-color: #fff9db;
-            color: #8c6d05;
-            font-weight: 600;
-            padding: 12px;
-            border-top: 1px solid #ffe066;
         }
     </style>
 </head>
@@ -165,23 +189,23 @@
     <div class="filtros-container">
         <div class="filtro-grupo">
             <label for="filtroUbigeo">UBIGEO</label>
-            <input type="text" id="filtroUbigeo" placeholder="Ej. 180302">
+            <input type="text" id="filtroUbigeo" placeholder="Ej. 10201">
         </div>
         <div class="filtro-grupo">
             <label for="filtroDepartamento">DEPARTAMENTO</label>
-            <input type="text" id="filtroDepartamento" placeholder="Ej. Moquegua">
+            <input type="text" id="filtroDepartamento" placeholder="Ej. Amazonas">
         </div>
         <div class="filtro-grupo">
             <label for="filtroProvincia">PROVINCIA</label>
-            <input type="text" id="filtroProvincia" placeholder="Ej. Ilo">
+            <input type="text" id="filtroProvincia" placeholder="Ej. Bagua">
         </div>
         <div class="filtro-grupo">
             <label for="filtroDistrito">DISTRITO</label>
-            <input type="text" id="filtroDistrito" placeholder="Ej. Pacocha">
+            <input type="text" id="filtroDistrito" placeholder="Ej. Copallin">
         </div>
         <div class="filtro-grupo">
             <label for="filtroUrbanizacion">URBANIZACIÓN / LOCALIDAD</label>
-            <input type="text" id="filtroUrbanizacion" placeholder="Ej. San Antonio">
+            <input type="text" id="filtroUrbanizacion" placeholder="Ej. Naranjos">
         </div>
     </div>
 
@@ -199,20 +223,46 @@
             </thead>
             <tbody id="tablaResultados">
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">
-                        Cargando base de datos de cobertura...
+                    <td colspan="6" style="text-align: center; padding: 30px; color: #64748b; font-weight: 600;">
+                        Cargando base de datos. Por favor espere...
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+    
+    <div class="paginacion-container">
+        <button id="btnAnterior" class="btn-paginacion" disabled>← Anterior</button>
+        <span id="infoPaginacion">Página 1 de 1</span>
+        <button id="btnSiguiente" class="btn-paginacion" disabled>Siguiente →</button>
+    </div>
 </div>
 
 <script>
     let datosCobertura = [];
+    let datosFiltrados = [];
+    
+    let paginaActual = 1;
+    const filasPorPagina = 100;
+
     const tbody = document.getElementById('tablaResultados');
     const inputs = document.querySelectorAll('.filtros-container input');
+    
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    const infoPaginacion = document.getElementById('infoPaginacion');
+    
     let temporizadorBusqueda;
+
+    // --- NUEVA FUNCIÓN: Elimina tildes y pasa todo a minúsculas ---
+    function normalizarTexto(texto) {
+        if (!texto) return "";
+        return String(texto)
+            .normalize("NFD") // Separa la letra de la tilde
+            .replace(/[\u0300-\u036f]/g, "") // Borra la tilde
+            .toLowerCase()
+            .trim();
+    }
 
     // 1. CARGA DE DATOS
     fetch('datos.json')
@@ -222,77 +272,123 @@
         })
         .then(datos => {
             datosCobertura = datos;
-            mostrarDatos(datosCobertura);
+            datosFiltrados = [...datosCobertura]; 
+            ordenarDatos();
+            renderizarTabla();
         })
         .catch(error => {
-            console.error('Error:', error);
-            tbody.innerHTML = `<tr><td colspan="6" class="no-results">Error crítico: No se pudo enlazar el archivo de datos JSON. Verifica que el archivo datos.json no tenga errores de sintaxis.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="no-results">❌ Error crítico: Verifica la sintaxis del archivo datos.json.</td></tr>`;
         });
 
-    // 2. RETRASO DE BÚSQUEDA (DEBOUNCE)
+    // 2. EVENTOS DE BÚSQUEDA
     inputs.forEach(input => {
         input.addEventListener('input', () => {
             clearTimeout(temporizadorBusqueda);
-            temporizadorBusqueda = setTimeout(filtrarDatos, 250);
+            temporizadorBusqueda = setTimeout(() => {
+                filtrarDatos();
+            }, 300);
         });
     });
 
-    // 3. MOTOR DE FILTRADO (AHORA CON LAS MAYÚSCULAS CORRECTAS)
-    function filtrarDatos() {
-        const uVal = document.getElementById('filtroUbigeo').value.toLowerCase().trim();
-        const depVal = document.getElementById('filtroDepartamento').value.toLowerCase().trim();
-        const provVal = document.getElementById('filtroProvincia').value.toLowerCase().trim();
-        const distVal = document.getElementById('filtroDistrito').value.toLowerCase().trim();
-        const urbVal = document.getElementById('filtroUrbanizacion').value.toLowerCase().trim();
-
-        if (!uVal && !depVal && !provVal && !distVal && !urbVal) {
-            mostrarDatos(datosCobertura);
-            return;
+    btnAnterior.addEventListener('click', () => {
+        if (paginaActual > 1) {
+            paginaActual--;
+            renderizarTabla();
         }
+    });
 
-        const resultados = datosCobertura.filter(item => {
-            // AQUI ESTÁ LA MAGIA: Usamos exactamente las llaves de tu JSON
+    btnSiguiente.addEventListener('click', () => {
+        const totalPaginas = Math.ceil(datosFiltrados.length / filasPorPagina);
+        if (paginaActual < totalPaginas) {
+            paginaActual++;
+            renderizarTabla();
+        }
+    });
+
+    // 3. LÓGICA DE FILTRADO INTELIGENTE
+    function filtrarDatos() {
+        // Obtenemos lo que escribe el usuario SIN TILDES
+        const uVal = document.getElementById('filtroUbigeo').value.trim().toLowerCase();
+        const depVal = normalizarTexto(document.getElementById('filtroDepartamento').value);
+        const provVal = normalizarTexto(document.getElementById('filtroProvincia').value);
+        const distVal = normalizarTexto(document.getElementById('filtroDistrito').value);
+        const urbVal = normalizarTexto(document.getElementById('filtroUrbanizacion').value);
+
+        datosFiltrados = datosCobertura.filter(item => {
+            // Obtenemos la base de datos SIN TILDES
             const ubigeoStr = String(item.UBIGEO || "").toLowerCase();
-            const depStr = String(item.Departamento || "").toLowerCase();
-            const provStr = String(item.Provincia || "").toLowerCase();
-            const distStr = String(item.Distrito || "").toLowerCase();
-            const urbStr = String(item.Urbanizacion || "").toLowerCase();
+            const depStr = normalizarTexto(item.Departamento);
+            const provStr = normalizarTexto(item.Provincia);
+            const distStr = normalizarTexto(item.Distrito);
+            const urbStr = normalizarTexto(item.Urbanizacion);
 
-            return ubigeoStr.includes(uVal) &&
-                   depStr.includes(depVal) &&
-                   provStr.includes(provVal) &&
-                   distStr.includes(distVal) &&
-                   urbStr.includes(urbVal);
+            // NUEVA LÓGICA: Añadimos un espacio al inicio (" " + texto) para buscar coincidencias exactas 
+            // al principio de las palabras. Esto evita que "ica" detecte "huancavelica".
+            const coincideUbigeo = ubigeoStr.includes(uVal);
+            const coincideDep = depVal === "" || (" " + depStr).includes(" " + depVal);
+            const coincideProv = provVal === "" || (" " + provStr).includes(" " + provVal);
+            const coincideDist = distVal === "" || (" " + distStr).includes(" " + distVal);
+            const coincideUrb = urbVal === "" || (" " + urbStr).includes(" " + urbVal);
+
+            return coincideUbigeo && coincideDep && coincideProv && coincideDist && coincideUrb;
         });
 
-        mostrarDatos(resultados);
+        ordenarDatos();
+        paginaActual = 1; 
+        renderizarTabla();
     }
 
-    // 4. MOSTRAR DATOS EN LA TABLA
-    function mostrarDatos(datos) {
-        tbody.innerHTML = ''; 
+    // --- NUEVO ORDENAMIENTO: Reconoce las tildes al ordenar alfabéticamente ---
+    function ordenarDatos() {
+        datosFiltrados.sort((a, b) => {
+            const depA = String(a.Departamento || "");
+            const depB = String(b.Departamento || "");
+            
+            // localeCompare con 'es' ordena correctamente Áncash junto a las demás A
+            const compDep = depA.localeCompare(depB, 'es', { sensitivity: 'base' });
+            if (compDep !== 0) return compDep;
 
-        if (datos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="no-results">❌ No se encontraron zonas con los criterios ingresados.</td></tr>';
+            const provA = String(a.Provincia || "");
+            const provB = String(b.Provincia || "");
+            const compProv = provA.localeCompare(provB, 'es', { sensitivity: 'base' });
+            if (compProv !== 0) return compProv;
+
+            const distA = String(a.Distrito || "");
+            const distB = String(b.Distrito || "");
+            return distA.localeCompare(distB, 'es', { sensitivity: 'base' });
+        });
+    }
+
+    // 4. RENDERIZADO Y PAGINACIÓN
+    function renderizarTabla() {
+        tbody.innerHTML = ''; 
+        const totalResultados = datosFiltrados.length;
+
+        if (totalResultados === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="no-results">🔍 No se encontraron zonas con los criterios ingresados.</td></tr>';
+            actualizarControlesPaginacion(0, 0);
             return;
         }
 
-        const limiteVisual = datos.slice(0, 100);
+        const totalPaginas = Math.ceil(totalResultados / filasPorPagina);
+        const indiceInicio = (paginaActual - 1) * filasPorPagina;
+        const indiceFin = indiceInicio + filasPorPagina;
+        const datosPagina = datosFiltrados.slice(indiceInicio, indiceFin);
 
-        limiteVisual.forEach(item => {
+        datosPagina.forEach(item => {
             const tr = document.createElement('tr');
             
             let coberturaClase = 'pendiente';
-            // Aseguramos que lea el campo "Cobertura" con la C mayúscula
             const coberturaTexto = String(item.Cobertura || "").trim(); 
+            const textoEvaluar = coberturaTexto.toLowerCase();
             
-            if (coberturaTexto.toLowerCase().includes('no cubre')) {
+            if (textoEvaluar.includes('no cubre')) {
                 coberturaClase = 'no-cubre';
-            } else if (coberturaTexto.toLowerCase().includes('take') || coberturaTexto.toLowerCase().includes('si') || coberturaTexto.length > 0) {
+            } else if (textoEvaluar.includes('take') || textoEvaluar.includes('si') || textoEvaluar.includes('contraentrega') || coberturaTexto.length > 0) {
                 coberturaClase = 'si-cubre';
             }
 
-            // Usamos las mayúsculas exactas de tu JSON
+            // Aquí mostramos el texto original (con sus tildes y mayúsculas intactas)
             tr.innerHTML = `
                 <td><strong>${item.UBIGEO || ''}</strong></td>
                 <td>${item.Departamento || ''}</td>
@@ -304,15 +400,23 @@
             tbody.appendChild(tr);
         });
 
-        if (datos.length > 100) {
-            const trAviso = document.createElement('tr');
-            trAviso.innerHTML = `
-                <td colspan="6" class="aviso-limite">
-                    ⚠️ Coincidencias excesivas (+${datos.length} encontradas). Se muestran las primeras 100 filas. Por favor, agregue más filtros para precisar el destino.
-                </td>
-            `;
-            tbody.appendChild(trAviso);
+        actualizarControlesPaginacion(totalPaginas, totalResultados);
+    }
+
+    function actualizarControlesPaginacion(totalPaginas, totalResultados) {
+        if (totalResultados === 0) {
+            infoPaginacion.textContent = `0 resultados`;
+            btnAnterior.disabled = true;
+            btnSiguiente.disabled = true;
+            return;
         }
+
+        infoPaginacion.textContent = `Página ${paginaActual} de ${totalPaginas} (${totalResultados} registros)`;
+        
+        btnAnterior.disabled = paginaActual === 1;
+        btnSiguiente.disabled = paginaActual === totalPaginas;
+        
+        document.querySelector('.tabla-wrapper').scrollTop = 0;
     }
 </script>
 
