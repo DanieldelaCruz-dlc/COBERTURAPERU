@@ -3,230 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COBERTURA PERU</title>
+    <title>COBERTURA PERÚ | Panel de Consulta</title>
     <style>
-        /* Estilos Base y Tipografía */
+        /* =========================================
+           VARIABLES Y ESTILOS BASE
+           ========================================= */
+        :root {
+            --bg-body: #e2e8f0;
+            --bg-card: #ffffff;
+            --primary: #1e293b;
+            --primary-light: #334155;
+            --accent: #ef4444;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
         *, *::before, *::after {
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background-color: #f5f7fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px; /* Le da un patrón sutil al fondo para que no se vea vacío */
             margin: 0;
-            padding: 15px;
-            color: #333;
+            padding: 20px 15px;
+            color: var(--text-main);
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        
-        /* Encabezado Principal */
-        h1 {
-            text-align: center;
-            color: #1e293b;
-            font-size: 26px;
+
+        /* =========================================
+           CABECERA DEL SISTEMA (BANNER)
+           ========================================= */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+            border-radius: 12px;
+            padding: 25px 30px;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Acento rojo superior */
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .header-titles h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
             letter-spacing: 1px;
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 3px solid #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        /* Bloque de Filtros */
-        .filtros-header {
-            background-color: #1e293b;
-            color: #ffffff;
-            padding: 12px 16px;
-            font-weight: 600;
+
+        .header-titles p {
+            margin: 5px 0 0 0;
+            color: #94a3b8;
             font-size: 14px;
-            border-radius: 6px 6px 0 0;
+            font-weight: 500;
         }
+
+        /* =========================================
+           PANEL DE FILTROS (CARD)
+           ========================================= */
+        .filtros-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .filtros-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
         .filtros-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            background-color: #f1f5f9;
-            padding: 15px;
-            border-radius: 0 0 6px 6px;
-            border: 1px solid #e2e8f0;
-            border-top: none;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
+
         .filtro-grupo {
             display: flex;
             flex-direction: column;
         }
+
         .filtro-grupo label {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 5px;
-            color: #64748b;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+
+        .input-wrapper {
+            position: relative;
+        }
+
         .filtro-grupo input {
-            padding: 9px;
-            font-size: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            outline: none;
-            transition: all 0.2s;
             width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 500;
         }
+
         .filtro-grupo input:focus {
             border-color: #3b82f6;
+            background-color: #ffffff;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Tabla Responsiva con Scroll Infinito */
+        .filtro-grupo input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* =========================================
+           TABLA DE RESULTADOS
+           ========================================= */
+        .tabla-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabla-header-info {
+            padding: 15px 25px;
+            background-color: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contador-resultados {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .contador-resultados span {
+            color: var(--primary);
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 5px;
+        }
+
         .tabla-wrapper {
-            overflow: auto; /* Permite scroll vertical y horizontal */
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            max-height: 65vh; /* Altura máxima para forzar el scroll interno */
+            overflow: auto;
+            max-height: 55vh;
             position: relative;
         }
+
+        /* Scrollbars Personalizados (Chrome, Safari, Edge) */
+        .tabla-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .tabla-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        .tabla-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        .tabla-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
             text-align: left;
-            background-color: #ffffff;
-            min-width: 800px;
+            min-width: 900px;
         }
+
         th {
-            background-color: #1e293b;
+            background-color: var(--primary-light);
             color: #ffffff;
             font-weight: 600;
-            padding: 12px 15px;
+            padding: 14px 20px;
             position: sticky;
             top: 0;
             z-index: 10;
-        }
-        td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #334155;
-        }
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-        
-        /* Badges de Cobertura */
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            text-align: center;
-            text-transform: capitalize;
-        }
-        .badge.no-cubre {
-            background-color: #fee2e2;
-            color: #ef4444;
-            border: 1px solid #fecaca;
-        }
-        .badge.si-cubre {
-            background-color: #dcfce7;
-            color: #16a34a;
-            border: 1px solid #bbf7d0;
-        }
-        .badge.pendiente {
-            background-color: #fef9c3;
-            color: #ca8a04;
-            border: 1px solid #fef08a;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
-        /* Utilidades y Mensajes */
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #ef4444;
-            font-weight: 600;
-            background-color: #fff5f5;
+        /* Cebras para la tabla */
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
         }
-        .contador-resultados {
-            text-align: right;
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 10px;
-            font-weight: 600;
+
+        td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background-color: #f1f5f9;
+        }
+        
+        /* =========================================
+           BADGES DE ESTADO (Píldoras)
+           ========================================= */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .badge.no-cubre {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+        .badge.no-cubre::before { background-color: #ef4444; }
+
+        .badge.si-cubre {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+        .badge.si-cubre::before { background-color: #22c55e; }
+
+        .badge.pendiente {
+            background-color: #fef9c3;
+            color: #a16207;
+            border: 1px solid #fde047;
+        }
+        .badge.pendiente::before { background-color: #eab308; }
+
+        /* Mensajes del Sistema */
+        .estado-vacio {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .estado-vacio span {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        .estado-vacio h3 {
+            margin: 0 0 5px 0;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>COBERTURA PERU</h1>
-
-    <div class="filtros-header">CRITERIOS DE BÚSQUEDA RÁPIDA</div>
-    <div class="filtros-container">
-        <div class="filtro-grupo">
-            <label for="filtroUbigeo">UBIGEO</label>
-            <input type="text" id="filtroUbigeo" placeholder="Ej. 10201">
-        </div>
-        <div class="filtro-grupo">
-            <label for="filtroDepartamento">DEPARTAMENTO</label>
-            <input type="text" id="filtroDepartamento" placeholder="Ej. Amazonas">
-        </div>
-        <div class="filtro-grupo">
-            <label for="filtroProvincia">PROVINCIA</label>
-            <input type="text" id="filtroProvincia" placeholder="Ej. Bagua">
-        </div>
-        <div class="filtro-grupo">
-            <label for="filtroDistrito">DISTRITO</label>
-            <input type="text" id="filtroDistrito" placeholder="Ej. Copallin">
-        </div>
-        <div class="filtro-grupo">
-            <label for="filtroUrbanizacion">URBANIZACIÓN / LOCALIDAD</label>
-            <input type="text" id="filtroUrbanizacion" placeholder="Ej. Naranjos">
+    
+    <div class="app-header">
+        <div class="header-titles">
+            <h1>📦 COBERTURA PERÚ</h1>
+            <p>Sistema de consulta rápida de zonas de despacho y cobertura.</p>
         </div>
     </div>
 
-    <div class="tabla-wrapper" id="tablaWrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>UBIGEO</th>
-                    <th>DEPARTAMENTO</th>
-                    <th>PROVINCIA</th>
-                    <th>DISTRITO</th>
-                    <th>URBANIZACION</th>
-                    <th>COBERTURA</th>
-                </tr>
-            </thead>
-            <tbody id="tablaResultados">
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 30px; color: #64748b; font-weight: 600;">
-                        Cargando base de datos. Por favor espere...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="filtros-card">
+        <div class="filtros-card-title">🔍 Criterios de Búsqueda</div>
+        <div class="filtros-container">
+            <div class="filtro-grupo">
+                <label for="filtroUbigeo"><span>🔢</span> UBIGEO</label>
+                <input type="text" id="filtroUbigeo" placeholder="Ej. 10201" autocomplete="off">
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroDepartamento"><span>🗺️</span> DEPARTAMENTO</label>
+                <input type="text" id="filtroDepartamento" placeholder="Ej. Amazonas" autocomplete="off">
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroProvincia"><span>🏙️</span> PROVINCIA</label>
+                <input type="text" id="filtroProvincia" placeholder="Ej. Bagua" autocomplete="off">
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroDistrito"><span>🏘️</span> DISTRITO</label>
+                <input type="text" id="filtroDistrito" placeholder="Ej. Copallin" autocomplete="off">
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroUrbanizacion"><span>📍</span> URBANIZACIÓN / LOCALIDAD</label>
+                <input type="text" id="filtroUrbanizacion" placeholder="Ej. Naranjos" autocomplete="off">
+            </div>
+        </div>
     </div>
-    <div class="contador-resultados" id="contadorResultados">Cargando...</div>
+
+    <div class="tabla-card">
+        <div class="tabla-header-info">
+            <div class="contador-resultados" id="contadorResultados">
+                Registros encontrados: <span>Cargando...</span>
+            </div>
+        </div>
+        
+        <div class="tabla-wrapper" id="tablaWrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🔢 UBIGEO</th>
+                        <th>🗺️ DEPARTAMENTO</th>
+                        <th>🏙️ PROVINCIA</th>
+                        <th>🏘️ DISTRITO</th>
+                        <th>📍 URBANIZACIÓN</th>
+                        <th>📡 COBERTURA</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaResultados">
+                    <tr>
+                        <td colspan="6">
+                            <div class="estado-vacio">
+                                <span>⏳</span>
+                                <h3>Cargando base de datos</h3>
+                                <p>Por favor espere un momento...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
     let datosCobertura = [];
     let datosFiltrados = [];
     
-    // Variables para el Scroll Infinito
+    // Scroll Infinito
     let indiceActual = 0;
-    const filasPorLote = 100; // Cantidad de filas que se inyectan en cada scroll
+    const filasPorLote = 100; 
 
     const tbody = document.getElementById('tablaResultados');
     const inputs = document.querySelectorAll('.filtros-container input');
     const tablaWrapper = document.getElementById('tablaWrapper');
-    const contadorResultados = document.getElementById('contadorResultados');
+    const contadorResultadosSpan = document.querySelector('#contadorResultados span');
     
     let temporizadorBusqueda;
 
-    // Normalizador de texto (Quita tildes y pasa a minúsculas)
+    // Normalizador de texto
     function normalizarTexto(texto) {
         if (!texto) return "";
         return String(texto)
@@ -236,7 +410,7 @@
             .trim();
     }
 
-    // 1. CARGA INICIAL DE DATOS
+    // 1. CARGA INICIAL
     fetch('datos.json')
         .then(respuesta => {
             if (!respuesta.ok) throw new Error('Error JSON');
@@ -249,31 +423,38 @@
             iniciarRenderizado();
         })
         .catch(error => {
-            tbody.innerHTML = `<tr><td colspan="6" class="no-results">❌ Error crítico: Verifica la sintaxis del archivo datos.json.</td></tr>`;
-            contadorResultados.textContent = "Error de carga";
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="estado-vacio">
+                            <span>❌</span>
+                            <h3>Error de conexión</h3>
+                            <p>No se pudo enlazar el archivo datos.json. Verifica la sintaxis del archivo.</p>
+                        </div>
+                    </td>
+                </tr>`;
+            contadorResultadosSpan.textContent = "Error";
         });
 
-    // 2. EVENTOS DE BÚSQUEDA
+    // 2. EVENTOS BÚSQUEDA
     inputs.forEach(input => {
         input.addEventListener('input', () => {
             clearTimeout(temporizadorBusqueda);
             temporizadorBusqueda = setTimeout(() => {
                 filtrarDatos();
-            }, 300);
+            }, 250);
         });
     });
 
-    // 3. EVENTO DE SCROLL INFINITO
+    // 3. EVENTO SCROLL
     tablaWrapper.addEventListener('scroll', () => {
-        // Calculamos si el usuario llegó cerca del fondo de la tabla (margen de 100px)
         const scrollCercaDelFondo = tablaWrapper.scrollTop + tablaWrapper.clientHeight >= tablaWrapper.scrollHeight - 100;
-        
         if (scrollCercaDelFondo) {
             cargarMasFilas();
         }
     });
 
-    // 4. LÓGICA DE FILTRADO
+    // 4. FILTRADO
     function filtrarDatos() {
         const uVal = document.getElementById('filtroUbigeo').value.trim().toLowerCase();
         const depVal = normalizarTexto(document.getElementById('filtroDepartamento').value);
@@ -301,7 +482,7 @@
         iniciarRenderizado();
     }
 
-    // Ordenamiento Alfabético estricto
+    // Ordenamiento
     function ordenarDatos() {
         datosFiltrados.sort((a, b) => {
             const depA = String(a.Departamento || "");
@@ -320,27 +501,34 @@
         });
     }
 
-    // 5. MOTORES DE RENDERIZADO
+    // 5. RENDERIZADO (DOM Seguro)
     function iniciarRenderizado() {
-        tbody.innerHTML = ''; // Limpiamos la tabla
-        indiceActual = 0; // Reiniciamos el contador de filas
-        tablaWrapper.scrollTop = 0; // Devolvemos el scroll arriba
+        tbody.innerHTML = ''; 
+        indiceActual = 0; 
+        tablaWrapper.scrollTop = 0; 
 
         if (datosFiltrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="no-results">🔍 No se encontraron zonas con los criterios ingresados.</td></tr>';
-            contadorResultados.textContent = `0 coincidencias encontradas`;
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="estado-vacio">
+                            <span>🔍</span>
+                            <h3>Sin resultados</h3>
+                            <p>No se encontraron zonas de cobertura con esos filtros.</p>
+                        </div>
+                    </td>
+                </tr>`;
+            contadorResultadosSpan.textContent = `0`;
             return;
         }
 
-        contadorResultados.textContent = `Coincidencias encontradas: ${datosFiltrados.length}`;
-        cargarMasFilas(); // Cargamos el primer lote
+        contadorResultadosSpan.textContent = new Intl.NumberFormat('es-PE').format(datosFiltrados.length);
+        cargarMasFilas(); 
     }
 
     function cargarMasFilas() {
-        // Si ya cargamos todas las filas, detenemos la función
         if (indiceActual >= datosFiltrados.length) return;
 
-        // Usamos un DocumentFragment para optimizar el rendimiento al inyectar HTML
         const fragmento = document.createDocumentFragment();
         const indiceFin = Math.min(indiceActual + filasPorLote, datosFiltrados.length);
         const datosLote = datosFiltrados.slice(indiceActual, indiceFin);
@@ -370,7 +558,7 @@
         });
 
         tbody.appendChild(fragmento);
-        indiceActual = indiceFin; // Actualizamos el índice para el próximo scroll
+        indiceActual = indiceFin; 
     }
 </script>
 
