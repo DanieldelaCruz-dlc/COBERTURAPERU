@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COBERTURA PERU</title>
+    <style>
+        /* Estilos Base y Tipografía */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Encabezado Principal */
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            font-size: 28px;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #ef4444;
+        }
+        
+        /* Bloque de Filtros */
+        .filtros-header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            border-radius: 6px 6px 0 0;
+        }
+        .filtros-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background-color: #f1f5f9;
+            padding: 20px;
+            border-radius: 0 0 6px 6px;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            margin-bottom: 25px;
+        }
+        .filtro-grupo {
+            display: flex;
+            flex-direction: column;
+        }
+        .filtro-grupo label {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #64748b;
+        }
+        .filtro-grupo input {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #ffffff;
+        }
+        .filtro-grupo input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Tabla de Resultados */
+        .tabla-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+            background-color: #ffffff;
+        }
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 14px 16px;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+            white-space: nowrap;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+        
+        /* Estado de Cobertura Visual (Badges) */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .badge.no-cubre {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+        .badge.si-cubre {
+            background-color: #dcfce7;
+            color: #22c55e;
+        }
+        .badge.pendiente {
+            background-color: #fef9c3;
+            color: #ca8a04;
+        }
+
+        /* Alertas y Mensajes del Sistema */
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #ef4444;
+            font-weight: 600;
+            background-color: #fff5f5;
+        }
+        .aviso-limite {
+            text-align: center;
+            background-color: #fff9db;
+            color: #8c6d05;
+            font-weight: 600;
+            padding: 12px;
+            border-top: 1px solid #ffe066;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>COBERTURA PERU</h1>
+
+    <div class="filtros-header">CRITERIOS DE BÚSQUEDA RÁPIDA</div>
+    <div class="filtros-container">
+        <div class="filtro-grupo">
+            <label for="filtroUbigeo">UBIGEO</label>
+            <input type="text" id="filtroUbigeo" placeholder="Ej. 180302">
+        </div>
+        <div class="filtro-grupo">
+            <label for="filtroDepartamento">DEPARTAMENTO</label>
+            <input type="text" id="filtroDepartamento" placeholder="Ej. Moquegua">
+        </div>
+        <div class="filtro-grupo">
+            <label for="filtroProvincia">PROVINCIA</label>
+            <input type="text" id="filtroProvincia" placeholder="Ej. Ilo">
+        </div>
+        <div class="filtro-grupo">
+            <label for="filtroDistrito">DISTRITO</label>
+            <input type="text" id="filtroDistrito" placeholder="Ej. Pacocha">
+        </div>
+        <div class="filtro-grupo">
+            <label for="filtroUrbanizacion">URBANIZACIÓN / LOCALIDAD</label>
+            <input type="text" id="filtroUrbanizacion" placeholder="Ej. San Antonio">
+        </div>
+    </div>
+
+    <div class="tabla-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>UBIGEO</th>
+                    <th>DEPARTAMENTO</th>
+                    <th>PROVINCIA</th>
+                    <th>DISTRITO</th>
+                    <th>URBANIZACION</th>
+                    <th>COBERTURA</th>
+                </tr>
+            </thead>
+            <tbody id="tablaResultados">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">
+                        Cargando base de datos de cobertura...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Memoria volátil para almacenar los datos una vez descargados
+    let datosCobertura = [];
+    
+    const tbody = document.getElementById('tablaResultados');
+    const inputs = document.querySelectorAll('.filtros-container input');
+    let temporizadorBusqueda;
+
+    // 1. CARGA ASÍNCRONA: Descarga el archivo JSON en segundo plano al abrir la página
+    fetch('datos.json')
+        .then(respuesta => {
+            if (!respuesta.ok) throw new Error('No se pudo cargar el archivo datos.json');
+            return respuesta.json();
+        })
+        .then(datos => {
+            datosCobertura = datos;
+            mostrarDatos(datosCobertura); // Inicializa mostrando la data
+        })
+        .catch(error => {
+            console.error('Error del sistema:', error);
+            tbody.innerHTML = `<tr><td colspan="6" class="no-results">Error crítico: No se pudo enlazar el archivo de datos JSON.</td></tr>`;
+        });
+
+    // 2. DEBOUNCE: Retrasa la ejecución del filtro mientras el operador escribe rápido
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            clearTimeout(temporizadorBusqueda);
+            temporizadorBusqueda = setTimeout(filtrarDatos, 250); // Espera 250ms de pausa al escribir
+        });
+    });
+
+    // 3. MOTOR DE FILTRADO
+    function filtrarDatos() {
+        // Obtenemos valores limpios en minúsculas
+        const uVal = document.getElementById('filtroUbigeo').value.toLowerCase().trim();
+        const depVal = document.getElementById('filtroDepartamento').value.toLowerCase().trim();
+        const provVal = document.getElementById('filtroProvincia').value.toLowerCase().trim();
+        const distVal = document.getElementById('filtroDistrito').value.toLowerCase().trim();
+        const urbVal = document.getElementById('filtroUrbanizacion').value.toLowerCase().trim();
+
+        // Si todos los campos están vacíos, renderizamos la base completa (con su respectivo tope)
+        if (!uVal && !depVal && !provVal && !distVal && !urbVal) {
+            mostrarDatos(datosCobertura);
+            return;
+        }
+
+        // Evaluamos fila por fila de forma ultra rápida
+        const resultados = datosCobertura.filter(item => {
+            const ubigeoStr = String(item.ubigeo || "").toLowerCase();
+            const depStr = String(item.departamento || "").toLowerCase();
+            const provStr = String(item.provincia || "").toLowerCase();
+            const distStr = String(item.distrito || "").toLowerCase();
+            const urbStr = String(item.urbanizacion || "").toLowerCase();
+
+            return ubigeoStr.includes(uVal) &&
+                   depStr.includes(depVal) &&
+                   provStr.includes(provVal) &&
+                   distStr.includes(distVal) &&
+                   urbStr.includes(urbVal);
+        });
+
+        mostrarDatos(resultados);
+    }
+
+    // 4. RENDERIZADO OPTIMIZADO (Tope máximo de 100 filas en pantalla)
+    function mostrarDatos(datos) {
+        tbody.innerHTML = ''; // Limpieza del DOM
+
+        if (datos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="no-results">❌ No se encontraron zonas con los criterios ingresados.</td></tr>';
+            return;
+        }
+
+        // Segmentación en memoria (Complejidad O(1) en el corte)
+        const limiteVisual = datos.slice(0, 100);
+
+        // Inyección masiva estructurada
+        limiteVisual.forEach(item => {
+            const tr = document.createElement('tr');
+            
+            // Asignación de clases CSS dinámicas según el tipo de cobertura
+            let coberturaClase = 'pendiente';
+            const coberturaTexto = String(item.cobertura || "").trim();
+            
+            if (coberturaTexto.toLowerCase().includes('no cubre')) {
+                coberturaClase = 'no-cubre';
+            } else if (coberturaTexto.toLowerCase().includes('take') || coberturaTexto.toLowerCase().includes('si') || coberturaTexto.length > 0) {
+                coberturaClase = 'si-cubre';
+            }
+
+            tr.innerHTML = `
+                <td><strong>${item.ubigeo || ''}</strong></td>
+                <td>${item.departamento || ''}</td>
+                <td>${item.provincia || ''}</td>
+                <td>${item.distrito || ''}</td>
+                <td>${item.urbanizacion || ''}</td>
+                <td><span class="badge ${coberturaClase}">${coberturaTexto}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Agrega fila de advertencia si los resultados superan el límite del rendimiento visual
+        if (datos.length > 100) {
+            const trAviso = document.createElement('tr');
+            trAviso.innerHTML = `
+                <td colspan="6" class="aviso-limite">
+                    ⚠️ Coincidencias excesivas (+${datos.length} encontradas). Se muestran las primeras 100 filas. Por favor, agregue más filtros para precisar el destino.
+                </td>
+            `;
+            tbody.appendChild(trAviso);
+        }
+    }
+</script>
+
+</body>
+</html>
