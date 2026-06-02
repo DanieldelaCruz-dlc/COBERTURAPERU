@@ -209,58 +209,54 @@
 </div>
 
 <script>
-    // Memoria volátil para almacenar los datos una vez descargados
     let datosCobertura = [];
-    
     const tbody = document.getElementById('tablaResultados');
     const inputs = document.querySelectorAll('.filtros-container input');
     let temporizadorBusqueda;
 
-    // 1. CARGA ASÍNCRONA: Descarga el archivo JSON en segundo plano al abrir la página
+    // 1. CARGA DE DATOS
     fetch('datos.json')
         .then(respuesta => {
-            if (!respuesta.ok) throw new Error('No se pudo cargar el archivo datos.json');
+            if (!respuesta.ok) throw new Error('No se encontró el archivo JSON');
             return respuesta.json();
         })
         .then(datos => {
             datosCobertura = datos;
-            mostrarDatos(datosCobertura); // Inicializa mostrando la data
+            mostrarDatos(datosCobertura);
         })
         .catch(error => {
-            console.error('Error del sistema:', error);
-            tbody.innerHTML = `<tr><td colspan="6" class="no-results">Error crítico: No se pudo enlazar el archivo de datos JSON.</td></tr>`;
+            console.error('Error:', error);
+            tbody.innerHTML = `<tr><td colspan="6" class="no-results">Error crítico: No se pudo enlazar el archivo de datos JSON. Verifica que el archivo datos.json no tenga errores de sintaxis.</td></tr>`;
         });
 
-    // 2. DEBOUNCE: Retrasa la ejecución del filtro mientras el operador escribe rápido
+    // 2. RETRASO DE BÚSQUEDA (DEBOUNCE)
     inputs.forEach(input => {
         input.addEventListener('input', () => {
             clearTimeout(temporizadorBusqueda);
-            temporizadorBusqueda = setTimeout(filtrarDatos, 250); // Espera 250ms de pausa al escribir
+            temporizadorBusqueda = setTimeout(filtrarDatos, 250);
         });
     });
 
-    // 3. MOTOR DE FILTRADO
+    // 3. MOTOR DE FILTRADO (AHORA CON LAS MAYÚSCULAS CORRECTAS)
     function filtrarDatos() {
-        // Obtenemos valores limpios en minúsculas
         const uVal = document.getElementById('filtroUbigeo').value.toLowerCase().trim();
         const depVal = document.getElementById('filtroDepartamento').value.toLowerCase().trim();
         const provVal = document.getElementById('filtroProvincia').value.toLowerCase().trim();
         const distVal = document.getElementById('filtroDistrito').value.toLowerCase().trim();
         const urbVal = document.getElementById('filtroUrbanizacion').value.toLowerCase().trim();
 
-        // Si todos los campos están vacíos, renderizamos la base completa (con su respectivo tope)
         if (!uVal && !depVal && !provVal && !distVal && !urbVal) {
             mostrarDatos(datosCobertura);
             return;
         }
 
-        // Evaluamos fila por fila de forma ultra rápida
         const resultados = datosCobertura.filter(item => {
-            const ubigeoStr = String(item.ubigeo || "").toLowerCase();
-            const depStr = String(item.departamento || "").toLowerCase();
-            const provStr = String(item.provincia || "").toLowerCase();
-            const distStr = String(item.distrito || "").toLowerCase();
-            const urbStr = String(item.urbanizacion || "").toLowerCase();
+            // AQUI ESTÁ LA MAGIA: Usamos exactamente las llaves de tu JSON
+            const ubigeoStr = String(item.UBIGEO || "").toLowerCase();
+            const depStr = String(item.Departamento || "").toLowerCase();
+            const provStr = String(item.Provincia || "").toLowerCase();
+            const distStr = String(item.Distrito || "").toLowerCase();
+            const urbStr = String(item.Urbanizacion || "").toLowerCase();
 
             return ubigeoStr.includes(uVal) &&
                    depStr.includes(depVal) &&
@@ -272,25 +268,23 @@
         mostrarDatos(resultados);
     }
 
-    // 4. RENDERIZADO OPTIMIZADO (Tope máximo de 100 filas en pantalla)
+    // 4. MOSTRAR DATOS EN LA TABLA
     function mostrarDatos(datos) {
-        tbody.innerHTML = ''; // Limpieza del DOM
+        tbody.innerHTML = ''; 
 
         if (datos.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="no-results">❌ No se encontraron zonas con los criterios ingresados.</td></tr>';
             return;
         }
 
-        // Segmentación en memoria (Complejidad O(1) en el corte)
         const limiteVisual = datos.slice(0, 100);
 
-        // Inyección masiva estructurada
         limiteVisual.forEach(item => {
             const tr = document.createElement('tr');
             
-            // Asignación de clases CSS dinámicas según el tipo de cobertura
             let coberturaClase = 'pendiente';
-            const coberturaTexto = String(item.cobertura || "").trim();
+            // Aseguramos que lea el campo "Cobertura" con la C mayúscula
+            const coberturaTexto = String(item.Cobertura || "").trim(); 
             
             if (coberturaTexto.toLowerCase().includes('no cubre')) {
                 coberturaClase = 'no-cubre';
@@ -298,18 +292,18 @@
                 coberturaClase = 'si-cubre';
             }
 
+            // Usamos las mayúsculas exactas de tu JSON
             tr.innerHTML = `
-                <td><strong>${item.ubigeo || ''}</strong></td>
-                <td>${item.departamento || ''}</td>
-                <td>${item.provincia || ''}</td>
-                <td>${item.distrito || ''}</td>
-                <td>${item.urbanizacion || ''}</td>
+                <td><strong>${item.UBIGEO || ''}</strong></td>
+                <td>${item.Departamento || ''}</td>
+                <td>${item.Provincia || ''}</td>
+                <td>${item.Distrito || ''}</td>
+                <td>${item.Urbanizacion || ''}</td>
                 <td><span class="badge ${coberturaClase}">${coberturaTexto}</span></td>
             `;
             tbody.appendChild(tr);
         });
 
-        // Agrega fila de advertencia si los resultados superan el límite del rendimiento visual
         if (datos.length > 100) {
             const trAviso = document.createElement('tr');
             trAviso.innerHTML = `
