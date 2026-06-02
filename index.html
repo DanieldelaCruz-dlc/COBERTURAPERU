@@ -37,7 +37,7 @@
             border-bottom: 3px solid #ef4444;
         }
         
-        /* Bloque de Filtros (Responsivo) */
+        /* Bloque de Filtros */
         .filtros-header {
             background-color: #1e293b;
             color: #ffffff;
@@ -81,12 +81,13 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Tabla Responsiva */
+        /* Tabla Responsiva con Scroll Infinito */
         .tabla-wrapper {
-            overflow-x: auto;
+            overflow: auto; /* Permite scroll vertical y horizontal */
             border: 1px solid #e2e8f0;
-            border-radius: 6px 6px 0 0;
-            max-height: 60vh;
+            border-radius: 6px;
+            max-height: 65vh; /* Altura máxima para forzar el scroll interno */
+            position: relative;
         }
         table {
             width: 100%;
@@ -140,43 +141,20 @@
             border: 1px solid #fef08a;
         }
 
-        /* Controles de Paginación */
-        .paginacion-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #475569;
-        }
-        .btn-paginacion {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .btn-paginacion:hover:not(:disabled) {
-            background-color: #2563eb;
-        }
-        .btn-paginacion:disabled {
-            background-color: #cbd5e1;
-            cursor: not-allowed;
-        }
+        /* Utilidades y Mensajes */
         .no-results {
             text-align: center;
             padding: 40px;
             color: #ef4444;
             font-weight: 600;
             background-color: #fff5f5;
+        }
+        .contador-resultados {
+            text-align: right;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 10px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -209,7 +187,7 @@
         </div>
     </div>
 
-    <div class="tabla-wrapper">
+    <div class="tabla-wrapper" id="tablaWrapper">
         <table>
             <thead>
                 <tr>
@@ -230,54 +208,49 @@
             </tbody>
         </table>
     </div>
-    
-    <div class="paginacion-container">
-        <button id="btnAnterior" class="btn-paginacion" disabled>← Anterior</button>
-        <span id="infoPaginacion">Página 1 de 1</span>
-        <button id="btnSiguiente" class="btn-paginacion" disabled>Siguiente →</button>
-    </div>
+    <div class="contador-resultados" id="contadorResultados">Cargando...</div>
 </div>
 
 <script>
     let datosCobertura = [];
     let datosFiltrados = [];
     
-    let paginaActual = 1;
-    const filasPorPagina = 100;
+    // Variables para el Scroll Infinito
+    let indiceActual = 0;
+    const filasPorLote = 100; // Cantidad de filas que se inyectan en cada scroll
 
     const tbody = document.getElementById('tablaResultados');
     const inputs = document.querySelectorAll('.filtros-container input');
-    
-    const btnAnterior = document.getElementById('btnAnterior');
-    const btnSiguiente = document.getElementById('btnSiguiente');
-    const infoPaginacion = document.getElementById('infoPaginacion');
+    const tablaWrapper = document.getElementById('tablaWrapper');
+    const contadorResultados = document.getElementById('contadorResultados');
     
     let temporizadorBusqueda;
 
-    // --- NUEVA FUNCIÓN: Elimina tildes y pasa todo a minúsculas ---
+    // Normalizador de texto (Quita tildes y pasa a minúsculas)
     function normalizarTexto(texto) {
         if (!texto) return "";
         return String(texto)
-            .normalize("NFD") // Separa la letra de la tilde
-            .replace(/[\u0300-\u036f]/g, "") // Borra la tilde
+            .normalize("NFD") 
+            .replace(/[\u0300-\u036f]/g, "") 
             .toLowerCase()
             .trim();
     }
 
-    // 1. CARGA DE DATOS
+    // 1. CARGA INICIAL DE DATOS
     fetch('datos.json')
         .then(respuesta => {
-            if (!respuesta.ok) throw new Error('No se encontró el archivo JSON');
+            if (!respuesta.ok) throw new Error('Error JSON');
             return respuesta.json();
         })
         .then(datos => {
             datosCobertura = datos;
             datosFiltrados = [...datosCobertura]; 
             ordenarDatos();
-            renderizarTabla();
+            iniciarRenderizado();
         })
         .catch(error => {
             tbody.innerHTML = `<tr><td colspan="6" class="no-results">❌ Error crítico: Verifica la sintaxis del archivo datos.json.</td></tr>`;
+            contadorResultados.textContent = "Error de carga";
         });
 
     // 2. EVENTOS DE BÚSQUEDA
@@ -290,24 +263,18 @@
         });
     });
 
-    btnAnterior.addEventListener('click', () => {
-        if (paginaActual > 1) {
-            paginaActual--;
-            renderizarTabla();
+    // 3. EVENTO DE SCROLL INFINITO
+    tablaWrapper.addEventListener('scroll', () => {
+        // Calculamos si el usuario llegó cerca del fondo de la tabla (margen de 100px)
+        const scrollCercaDelFondo = tablaWrapper.scrollTop + tablaWrapper.clientHeight >= tablaWrapper.scrollHeight - 100;
+        
+        if (scrollCercaDelFondo) {
+            cargarMasFilas();
         }
     });
 
-    btnSiguiente.addEventListener('click', () => {
-        const totalPaginas = Math.ceil(datosFiltrados.length / filasPorPagina);
-        if (paginaActual < totalPaginas) {
-            paginaActual++;
-            renderizarTabla();
-        }
-    });
-
-    // 3. LÓGICA DE FILTRADO INTELIGENTE
+    // 4. LÓGICA DE FILTRADO
     function filtrarDatos() {
-        // Obtenemos lo que escribe el usuario SIN TILDES
         const uVal = document.getElementById('filtroUbigeo').value.trim().toLowerCase();
         const depVal = normalizarTexto(document.getElementById('filtroDepartamento').value);
         const provVal = normalizarTexto(document.getElementById('filtroProvincia').value);
@@ -315,15 +282,12 @@
         const urbVal = normalizarTexto(document.getElementById('filtroUrbanizacion').value);
 
         datosFiltrados = datosCobertura.filter(item => {
-            // Obtenemos la base de datos SIN TILDES
             const ubigeoStr = String(item.UBIGEO || "").toLowerCase();
             const depStr = normalizarTexto(item.Departamento);
             const provStr = normalizarTexto(item.Provincia);
             const distStr = normalizarTexto(item.Distrito);
             const urbStr = normalizarTexto(item.Urbanizacion);
 
-            // NUEVA LÓGICA: Añadimos un espacio al inicio (" " + texto) para buscar coincidencias exactas 
-            // al principio de las palabras. Esto evita que "ica" detecte "huancavelica".
             const coincideUbigeo = ubigeoStr.includes(uVal);
             const coincideDep = depVal === "" || (" " + depStr).includes(" " + depVal);
             const coincideProv = provVal === "" || (" " + provStr).includes(" " + provVal);
@@ -334,17 +298,14 @@
         });
 
         ordenarDatos();
-        paginaActual = 1; 
-        renderizarTabla();
+        iniciarRenderizado();
     }
 
-    // --- NUEVO ORDENAMIENTO: Reconoce las tildes al ordenar alfabéticamente ---
+    // Ordenamiento Alfabético estricto
     function ordenarDatos() {
         datosFiltrados.sort((a, b) => {
             const depA = String(a.Departamento || "");
             const depB = String(b.Departamento || "");
-            
-            // localeCompare con 'es' ordena correctamente Áncash junto a las demás A
             const compDep = depA.localeCompare(depB, 'es', { sensitivity: 'base' });
             if (compDep !== 0) return compDep;
 
@@ -359,23 +320,32 @@
         });
     }
 
-    // 4. RENDERIZADO Y PAGINACIÓN
-    function renderizarTabla() {
-        tbody.innerHTML = ''; 
-        const totalResultados = datosFiltrados.length;
+    // 5. MOTORES DE RENDERIZADO
+    function iniciarRenderizado() {
+        tbody.innerHTML = ''; // Limpiamos la tabla
+        indiceActual = 0; // Reiniciamos el contador de filas
+        tablaWrapper.scrollTop = 0; // Devolvemos el scroll arriba
 
-        if (totalResultados === 0) {
+        if (datosFiltrados.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="no-results">🔍 No se encontraron zonas con los criterios ingresados.</td></tr>';
-            actualizarControlesPaginacion(0, 0);
+            contadorResultados.textContent = `0 coincidencias encontradas`;
             return;
         }
 
-        const totalPaginas = Math.ceil(totalResultados / filasPorPagina);
-        const indiceInicio = (paginaActual - 1) * filasPorPagina;
-        const indiceFin = indiceInicio + filasPorPagina;
-        const datosPagina = datosFiltrados.slice(indiceInicio, indiceFin);
+        contadorResultados.textContent = `Coincidencias encontradas: ${datosFiltrados.length}`;
+        cargarMasFilas(); // Cargamos el primer lote
+    }
 
-        datosPagina.forEach(item => {
+    function cargarMasFilas() {
+        // Si ya cargamos todas las filas, detenemos la función
+        if (indiceActual >= datosFiltrados.length) return;
+
+        // Usamos un DocumentFragment para optimizar el rendimiento al inyectar HTML
+        const fragmento = document.createDocumentFragment();
+        const indiceFin = Math.min(indiceActual + filasPorLote, datosFiltrados.length);
+        const datosLote = datosFiltrados.slice(indiceActual, indiceFin);
+
+        datosLote.forEach(item => {
             const tr = document.createElement('tr');
             
             let coberturaClase = 'pendiente';
@@ -388,7 +358,6 @@
                 coberturaClase = 'si-cubre';
             }
 
-            // Aquí mostramos el texto original (con sus tildes y mayúsculas intactas)
             tr.innerHTML = `
                 <td><strong>${item.UBIGEO || ''}</strong></td>
                 <td>${item.Departamento || ''}</td>
@@ -397,26 +366,11 @@
                 <td>${item.Urbanizacion || ''}</td>
                 <td><span class="badge ${coberturaClase}">${coberturaTexto}</span></td>
             `;
-            tbody.appendChild(tr);
+            fragmento.appendChild(tr);
         });
 
-        actualizarControlesPaginacion(totalPaginas, totalResultados);
-    }
-
-    function actualizarControlesPaginacion(totalPaginas, totalResultados) {
-        if (totalResultados === 0) {
-            infoPaginacion.textContent = `0 resultados`;
-            btnAnterior.disabled = true;
-            btnSiguiente.disabled = true;
-            return;
-        }
-
-        infoPaginacion.textContent = `Página ${paginaActual} de ${totalPaginas} (${totalResultados} registros)`;
-        
-        btnAnterior.disabled = paginaActual === 1;
-        btnSiguiente.disabled = paginaActual === totalPaginas;
-        
-        document.querySelector('.tabla-wrapper').scrollTop = 0;
+        tbody.appendChild(fragmento);
+        indiceActual = indiceFin; // Actualizamos el índice para el próximo scroll
     }
 </script>
 
