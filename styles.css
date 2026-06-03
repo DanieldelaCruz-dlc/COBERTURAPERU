@@ -268,3 +268,37 @@ tr:hover td {
     margin: 10px 0 5px 0;
     color: var(--primary);
 }
+
+/* =========================================
+   BOTÓN DE COPIAR DATOS
+   ========================================= */
+.celda-ubigeo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-copiar {
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+}
+
+.btn-copiar:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: scale(1.05);
+}
+
+.btn-copiar.copiado {
+    background-color: #dcfce7;
+    border-color: #86efac;
+}

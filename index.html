@@ -82,7 +82,6 @@
     let datosCobertura = [];
     let datosFiltrados = [];
     
-    // Configuración del Scroll Infinito
     let indiceActual = 0;
     const filasPorLote = 100; 
 
@@ -237,8 +236,20 @@
                 coberturaClase = 'si-cubre';
             }
 
+            // Aquí inyectamos el botón de copiar con los datos incrustados en la celda del UBIGEO
             tr.innerHTML = `
-                <td><strong>${item.UBIGEO || ''}</strong></td>
+                <td>
+                    <div class="celda-ubigeo">
+                        <button class="btn-copiar" 
+                            data-ubigeo="${item.UBIGEO || ''}" 
+                            data-dep="${item.Departamento || ''}" 
+                            data-prov="${item.Provincia || ''}" 
+                            data-dist="${item.Distrito || ''}" 
+                            onclick="copiarFila(this)" 
+                            title="Copiar UBIGEO, Departamento, Provincia y Distrito">📋</button>
+                        <strong>${item.UBIGEO || ''}</strong>
+                    </div>
+                </td>
                 <td>${item.Departamento || ''}</td>
                 <td>${item.Provincia || ''}</td>
                 <td>${item.Distrito || ''}</td>
@@ -250,6 +261,35 @@
 
         tbody.appendChild(fragmento);
         indiceActual = indiceFin; 
+    }
+
+    // 6. FUNCIÓN PARA COPIAR AL PORTAPAPELES
+    function copiarFila(btn) {
+        // Extraemos los datos ocultos en el botón
+        const ubigeo = btn.getAttribute('data-ubigeo');
+        const dep = btn.getAttribute('data-dep');
+        const prov = btn.getAttribute('data-prov');
+        const dist = btn.getAttribute('data-dist');
+        
+        // Creamos la cadena de texto con la tabulación (\t) entre cada dato
+        const textoCopiar = `${ubigeo}\t${dep}\t${prov}\t${dist}`;
+        
+        // Escribimos en el portapapeles
+        navigator.clipboard.writeText(textoCopiar).then(() => {
+            // Efecto visual de éxito
+            const iconoOriginal = btn.innerHTML;
+            btn.innerHTML = '▬';
+            btn.classList.add('copiado');
+            
+            // Regresa a la normalidad después de 1.5 segundos
+            setTimeout(() => {
+                btn.innerHTML = iconoOriginal;
+                btn.classList.remove('copiado');
+            }, 1500);
+        }).catch(err => {
+            console.error('No se pudo copiar el texto: ', err);
+            alert('Error al intentar copiar. Verifica los permisos de tu navegador.');
+        });
     }
 </script>
 
