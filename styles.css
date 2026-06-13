@@ -72,7 +72,7 @@ body {
 }
 
 /* =========================================
-   PANEL DE BUSCADOR
+   PANEL DE BUSCADOR Y BOTONES LIMPIAR
    ========================================= */
 .filtros-card {
     background: var(--bg-card);
@@ -82,14 +82,41 @@ body {
     border: 1px solid var(--border-color);
 }
 
+.filtros-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .filtros-card-title {
     font-size: 14px;
     font-weight: 700;
     color: var(--primary);
-    margin-bottom: 15px;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.btn-limpiar-todo {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-limpiar-todo:hover {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
 }
 
 .filtros-container {
@@ -113,9 +140,15 @@ body {
     gap: 5px;
 }
 
-.filtro-grupo input {
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 30px 10px 12px; /* Espacio extra a la derecha para la X */
     font-size: 13px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
@@ -124,14 +157,32 @@ body {
     color: var(--primary);
 }
 
-.filtro-grupo input:focus {
+.input-wrapper input:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.filtro-grupo input::placeholder {
+.input-wrapper input::placeholder {
     color: #94a3b8;
     text-transform: uppercase;
+}
+
+.btn-limpiar-input {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none; /* Oculto por defecto */
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.btn-limpiar-input:hover {
+    color: #ef4444;
 }
 
 /* =========================================
@@ -170,7 +221,7 @@ body {
 
 .tabla-wrapper {
     overflow: auto;
-    max-height: 75vh; 
+    max-height: 75vh;
     position: relative;
 }
 
@@ -214,7 +265,7 @@ tr:hover td {
 }
         
 /* =========================================
-   BADGES DE ESTADO
+   BADGES Y BOTÓN DE COPIAR
    ========================================= */
 .badge {
     display: inline-flex;
@@ -235,25 +286,11 @@ tr:hover td {
     border-radius: 50%;
 }
 
-.badge.no-cubre {
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-}
+.badge.no-cubre { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 .badge.no-cubre::before { background-color: #ef4444; }
-
-.badge.si-cubre {
-    background-color: #dcfce7;
-    color: #15803d;
-    border: 1px solid #86efac;
-}
+.badge.si-cubre { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 .badge.si-cubre::before { background-color: #22c55e; }
-
-.badge.pendiente {
-    background-color: #fef9c3;
-    color: #a16207;
-    border: 1px solid #fde047;
-}
+.badge.pendiente { background-color: #fef9c3; color: #a16207; border: 1px solid #fde047; }
 .badge.pendiente::before { background-color: #eab308; }
 
 .estado-vacio {
@@ -269,9 +306,6 @@ tr:hover td {
     color: var(--primary);
 }
 
-/* =========================================
-   BOTÓN DE COPIAR DATOS
-   ========================================= */
 .celda-ubigeo {
     display: flex;
     align-items: center;

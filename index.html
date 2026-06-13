@@ -18,27 +18,45 @@
     </div>
 
     <div class="filtros-card">
-        <div class="filtros-card-title">🔍 BUSCADOR</div>
+        <div class="filtros-header-flex">
+            <div class="filtros-card-title">🔍 BUSCADOR</div>
+            <button class="btn-limpiar-todo" onclick="limpiarTodosFiltros()" title="Borrar todas las búsquedas">🧹 Limpiar Filtros</button>
+        </div>
         <div class="filtros-container">
             <div class="filtro-grupo">
                 <label for="filtroUbigeo">🔢 UBIGEO</label>
-                <input type="text" id="filtroUbigeo" placeholder="COD POSTAL" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="text" id="filtroUbigeo" placeholder="COD POSTAL" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroUbigeo')" title="Borrar">&times;</button>
+                </div>
             </div>
             <div class="filtro-grupo">
                 <label for="filtroDepartamento">🗺️ DEPARTAMENTO</label>
-                <input type="text" id="filtroDepartamento" placeholder="DEPARTAMENTO" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="text" id="filtroDepartamento" placeholder="DEPARTAMENTO" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroDepartamento')" title="Borrar">&times;</button>
+                </div>
             </div>
             <div class="filtro-grupo">
                 <label for="filtroProvincia">🏙️ PROVINCIA</label>
-                <input type="text" id="filtroProvincia" placeholder="PROVINCIA" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="text" id="filtroProvincia" placeholder="PROVINCIA" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroProvincia')" title="Borrar">&times;</button>
+                </div>
             </div>
             <div class="filtro-grupo">
                 <label for="filtroDistrito">🏘️ DISTRITO</label>
-                <input type="text" id="filtroDistrito" placeholder="DISTRITO" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="text" id="filtroDistrito" placeholder="DISTRITO" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroDistrito')" title="Borrar">&times;</button>
+                </div>
             </div>
             <div class="filtro-grupo">
                 <label for="filtroUrbanizacion">📍 URBANIZACIÓN / LOCALIDAD</label>
-                <input type="text" id="filtroUrbanizacion" placeholder="URBANIZACION" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="text" id="filtroUrbanizacion" placeholder="URBANIZACION" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroUrbanizacion')" title="Borrar">&times;</button>
+                </div>
             </div>
         </div>
     </div>
@@ -86,7 +104,7 @@
     const filasPorLote = 100; 
 
     const tbody = document.getElementById('tablaResultados');
-    const inputs = document.querySelectorAll('.filtros-container input');
+    const inputs = document.querySelectorAll('.input-wrapper input');
     const tablaWrapper = document.getElementById('tablaWrapper');
     const contadorResultadosSpan = document.querySelector('#contadorResultados span');
     
@@ -127,9 +145,17 @@
             contadorResultadosSpan.textContent = "Error";
         });
 
-    // 2. EVENTOS BÚSQUEDA
+    // 2. EVENTOS BÚSQUEDA Y BOTONES "X"
     inputs.forEach(input => {
-        input.addEventListener('input', () => {
+        input.addEventListener('input', (e) => {
+            // Mostrar u ocultar la 'X' dependiendo de si hay texto
+            const btnLimpiar = e.target.nextElementSibling;
+            if (e.target.value.length > 0) {
+                btnLimpiar.style.display = 'block';
+            } else {
+                btnLimpiar.style.display = 'none';
+            }
+
             clearTimeout(temporizadorBusqueda);
             temporizadorBusqueda = setTimeout(() => {
                 filtrarDatos();
@@ -137,7 +163,26 @@
         });
     });
 
-    // 3. EVENTO SCROLL
+    // 3. FUNCIONES PARA LIMPIAR FILTROS
+    function limpiarFiltro(idInput) {
+        const input = document.getElementById(idInput);
+        input.value = '';
+        input.nextElementSibling.style.display = 'none';
+        filtrarDatos(); 
+    }
+
+    function limpiarTodosFiltros() {
+        inputs.forEach(input => {
+            input.value = '';
+            input.nextElementSibling.style.display = 'none';
+        });
+        
+        // ATAJO DE VELOCIDAD: En lugar de recalcular, cargamos la base original al instante
+        datosFiltrados = [...datosCobertura];
+        iniciarRenderizado();
+    }
+
+    // 4. EVENTO SCROLL
     tablaWrapper.addEventListener('scroll', () => {
         const scrollCercaDelFondo = tablaWrapper.scrollTop + tablaWrapper.clientHeight >= tablaWrapper.scrollHeight - 100;
         if (scrollCercaDelFondo) {
@@ -145,13 +190,20 @@
         }
     });
 
-    // 4. LÓGICA DE FILTRADO
+    // 5. LÓGICA DE FILTRADO
     function filtrarDatos() {
         const uVal = document.getElementById('filtroUbigeo').value.trim().toLowerCase();
         const depVal = normalizarTexto(document.getElementById('filtroDepartamento').value);
         const provVal = normalizarTexto(document.getElementById('filtroProvincia').value);
         const distVal = normalizarTexto(document.getElementById('filtroDistrito').value);
         const urbVal = normalizarTexto(document.getElementById('filtroUrbanizacion').value);
+
+        // ATAJO DE VELOCIDAD: Si todas las casillas están vacías, no filtramos ni ordenamos nada.
+        if (!uVal && !depVal && !provVal && !distVal && !urbVal) {
+            datosFiltrados = [...datosCobertura];
+            iniciarRenderizado();
+            return; // Salimos de la función inmediatamente
+        }
 
         datosFiltrados = datosCobertura.filter(item => {
             const ubigeoStr = String(item.UBIGEO || "").toLowerCase();
@@ -191,7 +243,7 @@
         });
     }
 
-    // 5. RENDERIZADO
+    // 6. RENDERIZADO
     function iniciarRenderizado() {
         tbody.innerHTML = ''; 
         indiceActual = 0; 
@@ -236,7 +288,6 @@
                 coberturaClase = 'si-cubre';
             }
 
-            // Aquí inyectamos el botón de copiar con los datos incrustados en la celda del UBIGEO
             tr.innerHTML = `
                 <td>
                     <div class="celda-ubigeo">
@@ -263,25 +314,20 @@
         indiceActual = indiceFin; 
     }
 
-    // 6. FUNCIÓN PARA COPIAR AL PORTAPAPELES
+    // 7. FUNCIÓN COPIAR
     function copiarFila(btn) {
-        // Extraemos los datos ocultos en el botón
         const ubigeo = btn.getAttribute('data-ubigeo');
         const dep = btn.getAttribute('data-dep');
         const prov = btn.getAttribute('data-prov');
         const dist = btn.getAttribute('data-dist');
         
-        // Creamos la cadena de texto con la tabulación (\t) entre cada dato
         const textoCopiar = `${ubigeo}\t${dep}\t${prov}\t${dist}`;
         
-        // Escribimos en el portapapeles
         navigator.clipboard.writeText(textoCopiar).then(() => {
-            // Efecto visual de éxito
             const iconoOriginal = btn.innerHTML;
-            btn.innerHTML = '▬';
+            btn.innerHTML = '✅';
             btn.classList.add('copiado');
             
-            // Regresa a la normalidad después de 1.5 segundos
             setTimeout(() => {
                 btn.innerHTML = iconoOriginal;
                 btn.classList.remove('copiado');
