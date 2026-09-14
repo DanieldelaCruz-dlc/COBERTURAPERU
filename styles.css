@@ -336,3 +336,30 @@ tr:hover td {
     background-color: #dcfce7;
     border-color: #86efac;
 }
+
+
+
+/* =========================================
+   BOTÓN DE GOOGLE MAPS
+   ========================================= */
+.btn-mapa {
+    background-color: #198754; /* Verde oscuro estilo Bootstrap */
+    color: #ffffff;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    display: inline-block;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.btn-mapa:hover {
+    background-color: #157347;
+    transform: translateY(-1px);
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+}

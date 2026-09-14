@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COBERTURA MÉXICO</title>
+    <link rel="stylesheet" href="../styles.css?v=2.0">
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- CABECERA -->
+    <div class="app-header">
+        <div class="header-titles">
+            <div class="titulo-con-bandera">
+                <!-- Enlace que te regresa al menú principal -->
+                <a href="../index.html" class="btn-volver-bandera" title="Volver al Menú Principal">
+                    <img src="https://flagcdn.com/w80/mx.png" alt="Bandera México">
+                </a>
+                <h1>COBERTURA MÉXICO</h1>
+            </div>
+            <p>Se alejan cositas...</p>
+        </div>
+    </div>
+
+    <div class="filtros-card">
+        <div class="filtros-header-flex">
+            <div class="filtros-card-title">🔍 BUSCADOR</div>
+            <button class="btn-limpiar-todo" onclick="limpiarTodosFiltros()" title="Borrar todas las búsquedas">🧹 Limpiar Filtros</button>
+        </div>
+        <div class="filtros-container">
+            <div class="filtro-grupo">
+                <label for="filtroUbigeo">🔢 COD POSTAL</label>
+                <div class="input-wrapper">
+                    <input type="text" id="filtroUbigeo" placeholder="COD POSTAL" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroUbigeo')" title="Borrar">&times;</button>
+                </div>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroDepartamento">🗺️ ESTADO</label>
+                <div class="input-wrapper">
+                    <input type="text" id="filtroDepartamento" placeholder="ESTADO" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroDepartamento')" title="Borrar">&times;</button>
+                </div>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroProvincia">🏙️ MUNICIPIO</label>
+                <div class="input-wrapper">
+                    <input type="text" id="filtroProvincia" placeholder="MUNICIPIO" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroProvincia')" title="Borrar">&times;</button>
+                </div>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroDistrito">🏘️ CIUDAD</label>
+                <div class="input-wrapper">
+                    <input type="text" id="filtroDistrito" placeholder="CIUDAD" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroDistrito')" title="Borrar">&times;</button>
+                </div>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroUrbanizacion">📍 COLONIA</label>
+                <div class="input-wrapper">
+                    <input type="text" id="filtroUrbanizacion" placeholder="COLONIA" autocomplete="off">
+                    <button class="btn-limpiar-input" onclick="limpiarFiltro('filtroUrbanizacion')" title="Borrar">&times;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabla-card">
+        <div class="tabla-header-info">
+            <div class="contador-resultados" id="contadorResultados">
+                Registros encontrados: <span>Cargando...</span>
+            </div>
+        </div>
+        
+        <div class="tabla-wrapper" id="tablaWrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🔢 COD POSTAL</th>
+                        <th> ♣ ESTADO</th>
+                        <th>🏙️ MUNICIPIO</th>
+                        <th>🏘️ CIUDAD</th>
+                        <th>📍 COLONIA</th>
+                        <th>📡 COBERTURA</th>
+                        <th style="text-align: center;">🗺️ MAPA</th> <!-- Nueva Columna -->
+                    </tr>
+                </thead>
+                <tbody id="tablaResultados">
+                    <tr>
+                        <td colspan="7">
+                            <div class="estado-vacio">
+                                ⏳
+                                <h3>Cargando base de datos</h3>
+                                <p>Por favor espere un momento...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let datosCobertura = [];
+    let datosFiltrados = [];
+    
+    let indiceActual = 0;
+    const filasPorLote = 100; 
+
+    const tbody = document.getElementById('tablaResultados');
+    const inputs = document.querySelectorAll('.input-wrapper input');
+    const tablaWrapper = document.getElementById('tablaWrapper');
+    const contadorResultadosSpan = document.querySelector('#contadorResultados span');
+    
+    let temporizadorBusqueda;
+
+    function normalizarTexto(texto) {
+        if (!texto) return "";
+        return String(texto)
+            .normalize("NFD") 
+            .replace(/[\u0300-\u036f]/g, "") 
+            .toLowerCase()
+            .trim();
+    }
+
+    // 1. CARGA INICIAL
+    fetch('../Data/datosMexico.json')
+        .then(respuesta => {
+            if (!respuesta.ok) throw new Error('Error JSON');
+            return respuesta.json();
+        })
+        .then(datos => {
+            datosCobertura = datos;
+            datosFiltrados = [...datosCobertura]; 
+            ordenarDatos();
+            iniciarRenderizado();
+        })
+        .catch(error => {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="estado-vacio">
+                            ❌
+                            <h3>Error de conexión</h3>
+                            <p>No se pudo enlazar el archivo datos.json.</p>
+                        </div>
+                    </td>
+                </tr>`;
+            contadorResultadosSpan.textContent = "Error";
+        });
+
+    // 2. EVENTOS BÚSQUEDA Y BOTONES "X"
+    inputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            // Mostrar u ocultar la 'X' dependiendo de si hay texto
+            const btnLimpiar = e.target.nextElementSibling;
+            if (e.target.value.length > 0) {
+                btnLimpiar.style.display = 'block';
+            } else {
+                btnLimpiar.style.display = 'none';
+            }
+
+            clearTimeout(temporizadorBusqueda);
+            temporizadorBusqueda = setTimeout(() => {
+                filtrarDatos();
+            }, 250);
+        });
+    });
+
+    // 3. FUNCIONES PARA LIMPIAR FILTROS
+    function limpiarFiltro(idInput) {
+        const input = document.getElementById(idInput);
+        input.value = '';
+        input.nextElementSibling.style.display = 'none';
+        filtrarDatos(); 
+    }
+
+    function limpiarTodosFiltros() {
+        inputs.forEach(input => {
+            input.value = '';
+            input.nextElementSibling.style.display = 'none';
+        });
+        
+        // ATAJO DE VELOCIDAD: En lugar de recalcular, cargamos la base original al instante
+        datosFiltrados = [...datosCobertura];
+        iniciarRenderizado();
+    }
+
+    // 4. SCROLL
+    tablaWrapper.addEventListener('scroll', () => {
+        const scrollCercaDelFondo = tablaWrapper.scrollTop + tablaWrapper.clientHeight >= tablaWrapper.scrollHeight - 100;
+        if (scrollCercaDelFondo) {
+            cargarMasFilas();
+        }
+    });
+
+    // 5. LÓGICA DE FILTRADO
+    function filtrarDatos() {
+        const uVal = document.getElementById('filtroUbigeo').value.trim().toLowerCase();
+        const depVal = normalizarTexto(document.getElementById('filtroDepartamento').value);
+        const provVal = normalizarTexto(document.getElementById('filtroProvincia').value);
+        const distVal = normalizarTexto(document.getElementById('filtroDistrito').value);
+        const urbVal = normalizarTexto(document.getElementById('filtroUrbanizacion').value);
+
+        // ATAJO DE VELOCIDAD: Si todas las casillas están vacías, no filtramos ni ordenamos nada.
+        if (!uVal && !depVal && !provVal && !distVal && !urbVal) {
+            datosFiltrados = [...datosCobertura];
+            iniciarRenderizado();
+            return; 
+        }
+
+        datosFiltrados = datosCobertura.filter(item => {
+            const ubigeoStr = String(item.UBIGEO || "").toLowerCase();
+            const depStr = normalizarTexto(item.Departamento);
+            const provStr = normalizarTexto(item.Provincia);
+            const distStr = normalizarTexto(item.Distrito);
+            const urbStr = normalizarTexto(item.Urbanizacion);
+
+            const coincideUbigeo = ubigeoStr.includes(uVal);
+            const coincideDep = depVal === "" || (" " + depStr).includes(" " + depVal);
+            const coincideProv = provVal === "" || (" " + provStr).includes(" " + provVal);
+            const coincideDist = distVal === "" || (" " + distStr).includes(" " + distVal);
+            const coincideUrb = urbVal === "" || (" " + urbStr).includes(" " + urbVal);
+
+            return coincideUbigeo && coincideDep && coincideProv && coincideDist && coincideUrb;
+        });
+
+        ordenarDatos();
+        iniciarRenderizado();
+    }
+
+    function ordenarDatos() {
+        datosFiltrados.sort((a, b) => {
+            const depA = String(a.Departamento || "");
+            const depB = String(b.Departamento || "");
+            const compDep = depA.localeCompare(depB, 'es', { sensitivity: 'base' });
+            if (compDep !== 0) return compDep;
+
+            const provA = String(a.Provincia || "");
+            const provB = String(b.Provincia || "");
+            const compProv = provA.localeCompare(provB, 'es', { sensitivity: 'base' });
+            if (compProv !== 0) return compProv;
+
+            const distA = String(a.Distrito || "");
+            const distB = String(b.Distrito || "");
+            return distA.localeCompare(distB, 'es', { sensitivity: 'base' });
+        });
+    }
+
+    // 6. RENDERIZADO
+    function iniciarRenderizado() {
+        tbody.innerHTML = ''; 
+        indiceActual = 0; 
+        tablaWrapper.scrollTop = 0; 
+
+        if (datosFiltrados.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="estado-vacio">
+                            🔍
+                            <h3>Sin resultados</h3>
+                            <p>No se encontraron zonas de cobertura con esos filtros.</p>
+                        </div>
+                    </td>
+                </tr>`;
+            contadorResultadosSpan.textContent = `0`;
+            return;
+        }
+
+        contadorResultadosSpan.textContent = new Intl.NumberFormat('es-PE').format(datosFiltrados.length);
+        cargarMasFilas(); 
+    }
+
+    function cargarMasFilas() {
+        if (indiceActual >= datosFiltrados.length) return;
+
+        const fragmento = document.createDocumentFragment();
+        const indiceFin = Math.min(indiceActual + filasPorLote, datosFiltrados.length);
+        const datosLote = datosFiltrados.slice(indiceActual, indiceFin);
+
+        datosLote.forEach(item => {
+            const tr = document.createElement('tr');
+            
+            let coberturaClase = 'pendiente';
+            const coberturaTexto = String(item.Cobertura || "").trim(); 
+            const textoEvaluar = coberturaTexto.toLowerCase();
+            
+            // He agregado "con cobertura" como un caso positivo basándome en tu imagen
+            if (textoEvaluar.includes('sin cobertura')) {
+                coberturaClase = 'no-cubre';
+            } else if (textoEvaluar.includes('take') || textoEvaluar.includes('si') || textoEvaluar.includes('contraentrega') || textoEvaluar.includes('con cobertura') || coberturaTexto.length > 0) {
+                coberturaClase = 'si-cubre';
+            }
+
+            // --- NUEVO: CREACIÓN DE LA RUTA PARA GOOGLE MAPS ---
+            // Unimos todos los datos geográficos y añadimos "México" al final
+            const terminoBusqueda = `${item.Departamento || ''} ${item.Provincia || ''} ${item.Distrito || ''} ${item.Urbanizacion || ''} México`;
+            
+            // encodeURIComponent asegura que los espacios y tildes no rompan el link
+            const urlMaps = `https://www.google.com/maps/place/${encodeURIComponent(terminoBusqueda)}`;
+            // ---------------------------------------------------
+
+            tr.innerHTML = `
+                <td>
+                    <div class="celda-ubigeo">
+                        <button class="btn-copiar" 
+                            data-ubigeo="${item.UBIGEO || ''}" 
+                            data-dep="${item.Departamento || ''}" 
+                            data-prov="${item.Provincia || ''}" 
+                            data-dist="${item.Distrito || ''}" 
+                            data-urb="${item.Urbanizacion || ''}" 
+                            onclick="copiarFila(this)" 
+                            title="Copiar UBIGEO, Estado, Municipio, Ciudad y Colonia">📋</button>
+                        <strong>${item.UBIGEO || ''}</strong>
+                    </div>
+                </td>
+                <td>${item.Departamento || ''}</td>
+                <td>${item.Provincia || ''}</td>
+                <td>${item.Distrito || ''}</td>
+                <td>${item.Urbanizacion || ''}</td>
+                <td><span class="badge ${coberturaClase}">${coberturaTexto}</span></td>
+                
+                <!-- NUEVA COLUMNA CON EL BOTÓN DEL MAPA -->
+                <td style="text-align: center;">
+                    <a href="${urlMaps}" target="_blank" class="btn-mapa" title="Abrir ubicación en Google Maps">MAPA</a>
+                </td>
+            `;
+            fragmento.appendChild(tr);
+        });
+
+        tbody.appendChild(fragmento);
+        indiceActual = indiceFin; 
+    }
+
+    // 7. FUNCIÓN COPIAR
+    function copiarFila(btn) {
+        const ubigeo = btn.getAttribute('data-ubigeo');
+        const dep = btn.getAttribute('data-dep');
+        const prov = btn.getAttribute('data-prov');
+        const dist = btn.getAttribute('data-dist');
+        const urb = btn.getAttribute('data-urb');
+        
+        const textoCopiar = `${ubigeo}\t${dep}\t${prov}\t${dist}\t${urb}`;
+        
+        navigator.clipboard.writeText(textoCopiar).then(() => {
+            const iconoOriginal = btn.innerHTML;
+            btn.innerHTML = '✅';
+            btn.classList.add('copiado');
+            
+            setTimeout(() => {
+                btn.innerHTML = iconoOriginal;
+                btn.classList.remove('copiado');
+            }, 1500);
+        }).catch(err => {
+            console.error('No se pudo copiar el texto: ', err);
+            alert('Error al intentar copiar. Verifica los permisos de tu navegador.');
+        });
+    }
+</script>
+
+</body>
+</html>

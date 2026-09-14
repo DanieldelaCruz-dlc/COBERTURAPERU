@@ -1,0 +1,132 @@
+/* =========================================
+           ESTILOS DEL PORTAL PRINCIPAL
+           ========================================= */
+        body { 
+            background-color: #0f172a; /* Azul noche corporativo */
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 50px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        
+        h1 { 
+            font-size: 32px; 
+            margin: 0 0 10px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            text-align: center; 
+        }
+        
+        p.subtitle { 
+            color: #94a3b8; 
+            font-size: 16px; 
+            margin-bottom: 50px; 
+            text-align: center; 
+        }
+
+        .grid-paises { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 30px; 
+            max-width: 1200px; 
+            width: 100%; 
+        }
+
+        /* =========================================
+           TARJETAS DE PAÍSES
+           ========================================= */
+        .card-pais { 
+            position: relative; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            aspect-ratio: 16/10; 
+            cursor: pointer; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); 
+            background: #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        }
+
+        .card-pais:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 30px rgba(239, 68, 68, 0.25); /* Resplandor rojo sutil */
+        }
+        
+        .bandera { 
+            position: absolute; 
+            inset: 0; 
+            background-size: cover; 
+            background-position: center; 
+            transition: all 0.4s ease; 
+        }
+        
+        /* Capa oscura que aparece al pasar el mouse */
+        .overlay { 
+            position: absolute; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.8); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            opacity: 0; 
+            transition: opacity 0.4s ease; 
+            z-index: 2; 
+        }
+        
+        /* EL EFECTO PIXELADO Y ZOOM */
+        .card-pais:hover .bandera {
+            filter: url(#efectoPixelado) brightness(0.6);
+            transform: scale(1.1);
+        }
+        
+        .card-pais:hover .overlay { 
+            opacity: 1; 
+        }
+        
+        /* Textos dentro de la tarjeta */
+        .overlay h2 { 
+            margin: 0; 
+            font-size: 34px; 
+            font-weight: 800; 
+            letter-spacing: 2px; 
+            color: #ffffff; 
+            transform: translateY(20px); 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        
+        .overlay span { 
+            margin-top: 10px; 
+            font-size: 13px; 
+            color: #ef4444; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            opacity: 0; 
+            transition: opacity 0.4s ease 0.1s; 
+            letter-spacing: 1px;
+        }
+        
+        .card-pais:hover .overlay h2 { transform: translateY(0); }
+        .card-pais:hover .overlay span { opacity: 1; }
+
+        /* Etiquetas de estado (Esquina superior derecha) */
+        .badge-estado { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: #475569; 
+            color: white; 
+            font-size: 10px; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            z-index: 3; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); 
+            letter-spacing: 0.5px;
+        }
+        .badge-estado.activo { 
+            background: #ef4444; /* Rojo para resaltar el activo */
+        }
